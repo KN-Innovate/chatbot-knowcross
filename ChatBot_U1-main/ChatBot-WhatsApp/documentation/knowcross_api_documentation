@@ -1,0 +1,98 @@
+WhatsApp Chatbot Integration with KnowCross API and Meta Developer API
+Overview
+This document provides an extensive and detailed overview of the WhatsApp chatbot code that integrates with both the Meta Developer API (WhatsApp Cloud API) and the KnowCross API for managing service requests such as room service, maintenance, and other guest-related inquiries.
+
+Key Components
+Flask Web Application:
+
+The chatbot is implemented using Flask, a lightweight Python web framework. The Flask app listens for incoming HTTP requests (via webhook) and sends responses back to WhatsApp users.
+WhatsApp Cloud API:
+
+The bot interacts with the WhatsApp Cloud API using Meta's developer platform to send and receive messages.
+The app uses an Access Token for authentication and a Phone Number ID to send messages to the WhatsApp number associated with the business.
+KnowCross API Integration:
+
+KnowCross is a hotel operations management platform that handles various operational tasks like service requests, room assignments, and maintenance management.
+The chatbot uses KnowCross APIs to register service requests (e.g., room service).
+HMAC-SHA256 signatures are used for authenticating API calls with KnowCross.
+File Breakdown:
+WhatsApp Cloud API Integration:
+
+The app is configured to connect to the WhatsApp Cloud API using an Access Token and a Phone Number ID.
+Messages sent to WhatsApp are processed by the /webhook route. The app listens for incoming messages and responds based on predefined actions (like registering a service request).
+KnowCross Integration:
+
+The app communicates with KnowCross to log service requests from guests (e.g., room service).
+The generate_signature function creates an authentication signature required by KnowCross API for secure communication.
+The register_service_request function registers a service request with KnowCross, including details like location, category, and guest remarks.
+Webhook for Receiving Messages:
+
+The /webhook route handles both GET and POST requests.
+GET request is used to verify the webhook with WhatsApp Cloud API during setup.
+POST request processes incoming WhatsApp messages. If the message body matches predefined keywords like "room service", the bot proceeds to register a service request using KnowCross API.
+Signature Generation for KnowCross:
+
+The generate_signature function creates the required signature for authenticating API requests to KnowCross. It combines several pieces of information (method, endpoint, timestamp) and uses HMAC-SHA256 hashing to generate a secure signature.
+The signature is sent in the request header to authenticate API calls.
+Sending WhatsApp Replies:
+
+The send_reply function sends a message to the user on WhatsApp. It is called whenever the bot needs to respond to a user query.
+The response message is sent via a POST request to the WhatsApp Cloud API.
+Detailed Flow of the Chatbot:
+WhatsApp Message Received:
+
+When a user sends a message to the WhatsApp number linked to the bot, the message is received by the /webhook route.
+The bot processes the message and identifies the sender, message content, and type.
+Triggering Actions:
+
+If the message is identified as a request for room service (or another predefined action), the bot triggers the corresponding function.
+The bot calls the register_service_request function to log the service request via the KnowCross API.
+Processing Service Request:
+
+The register_service_request function fetches the necessary master data (like location, category, description IDs) from the KnowCross API.
+The sanitized remarks from the user are used to create a service request payload, which is sent to KnowCross for processing.
+Sending the Response to the User:
+
+After the request is successfully registered with KnowCross, the bot responds with a message (e.g., "Room service requested successfully") via the send_reply function.
+If the message is not understood, the bot replies with a default response (e.g., "I'm sorry, I didn't understand your request.").
+Security Considerations:
+HMAC-SHA256 is used for securely generating signatures for KnowCross API calls, ensuring that requests are authenticated and not tampered with.
+The Access Token for WhatsApp Cloud API and Private Key for KnowCross API should be stored securely, either in environment variables or a secrets management system.
+The Phone Number ID and Verify Token are used for verifying incoming webhook requests from WhatsApp.
+Setting Up the Webhook:
+WhatsApp API Webhook Setup:
+
+The webhook URL provided by the bot (e.g., https://yourdomain.com/webhook) must be configured in the Meta Developer Account to receive incoming messages from WhatsApp.
+The bot uses the VERIFY_TOKEN to verify that the incoming requests to the webhook are coming from WhatsApp Cloud API.
+Testing the Webhook:
+
+During setup, WhatsApp Cloud API sends a GET request to the webhook URL for verification.
+The bot should respond with the challenge token to complete the verification process.
+Once verified, the bot can receive and respond to incoming messages.
+Key Endpoints:
+Webhook Verification (GET Method):
+
+URL: /webhook?hub.verify_token=your_verify_token
+Purpose: Verifies the webhook with WhatsApp Cloud API during setup.
+Response: Returns the hub.challenge if the token is valid.
+Message Handling (POST Method):
+
+URL: /webhook
+Purpose: Receives incoming messages from WhatsApp.
+Response: Sends a response to the user on WhatsApp based on the content of the message.
+Potential Enhancements:
+Support for More Service Requests:
+
+Extend the bot's functionality by adding more predefined service requests, such as maintenance, room cleaning, or food orders.
+User Feedback Integration:
+
+Integrate feedback collection after a service request is completed. The bot can ask users if they were satisfied with the service and submit this feedback to KnowCross.
+Natural Language Processing (NLP):
+
+Use NLP models to better understand user queries beyond predefined keywords (e.g., "can I get a towel" or "my sink is leaking").
+Error Handling and Logging:
+
+Improve error handling to provide more detailed error messages and logs for debugging.
+Real-Time Data:
+
+Integrate real-time data from KnowCross, such as current room availability or maintenance status, to provide more dynamic responses.

@@ -1,0 +1,11 @@
+{
+    "hi": "Hello! How can I assist you today?",
+    "menu": "1. Room Service\n2. Spa\n3. Help Desk",
+    "wifi": "The Wi-Fi password is: hotel123",
+    "restaurant hours": "The restaurant is open from 7 AM to 10 PM.",
+    "spa hours": "The spa is open from 9 AM to 8 PM.",
+    "room service": "Room service is available 24/7. Reply 'room service menu' to view the options.",
+    "room service menu": "Here is the room service menu: https://hotelwebsite.com/roomservice",
+    "check-out time": "The check-out time is 11 AM.",
+    "events": "Visit https://hotelwebsite.com/events for details."
+}
